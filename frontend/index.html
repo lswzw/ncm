@@ -39,6 +39,10 @@
                     <span class="icon">◉</span>
                     <span data-i18n="nav_listen">正在监听</span>
                 </li>
+                <li class="nav-item" onclick="setFilter('WAIT')" id="nav-wait">
+                    <span class="icon">⏳</span>
+                    <span data-i18n="nav_wait">等待关闭</span>
+                </li>
                 <li class="nav-item" onclick="setFilter('OTHER')" id="nav-other">
                     <span class="icon">○</span>
                     <span data-i18n="nav_other">其他状态</span>
@@ -66,8 +70,8 @@
                         <select id="refresh-rate" onchange="changeRefreshRate()">
                             <option value="1000">1s</option>
                             <option value="3000">3s</option>
-                            <option value="5000" selected>5s</option>
-                            <option value="10000">10s</option>
+                            <option value="5000">5s</option>
+                            <option value="10000" selected>10s</option>
                             <option value="30000">30s</option>
                             <option value="0" data-i18n="rate_manual">手动</option>
                         </select>
@@ -134,9 +138,7 @@
                             <div class="stat-label" data-i18n="stat_process">最活跃进程</div>
                             <div class="stat-icon-small">⚡️</div>
                         </div>
-                        <div class="stat-value" id="stat-process-name"
-                            style="font-size: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                            -</div>
+                        <div class="stat-value" id="stat-process-name">-</div>
                         <div class="stat-subtext" id="stat-process-count">0</div>
                     </div>
                 </div>

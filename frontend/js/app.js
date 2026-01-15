@@ -5,6 +5,7 @@ const i18n = {
         nav_all_conns: "全部连接",
         nav_est: "正在通信",
         nav_listen: "正在监听",
+        nav_wait: "等待关闭",
         nav_other: "其他状态",
         nav_about: "关于软件",
         stat_total: "全部连接",
@@ -30,6 +31,7 @@ const i18n = {
         nav_all_conns: "All Connections",
         nav_est: "Established",
         nav_listen: "Listening",
+        nav_wait: "Waiting Close",
         nav_other: "Others",
         nav_about: "About App",
         stat_total: "Total",
@@ -207,9 +209,12 @@ function applyFilterAndRender() {
             updateStatsPanel(allConnections);
         }
 
-        // 2. 随机取 6 条展示
-        // 克隆数组以免影响原数据，然后打乱
-        const shuffled = [...allConnections].sort(() => 0.5 - Math.random());
+        // 2. 概览模式只展示"正在通信"的连接 (随机取6条)
+        // 如果没有通信连接，则显示空或随机其他
+        const established = allConnections.filter(c => c.status === 'ESTABLISHED');
+        const source = established.length > 0 ? established : allConnections;
+
+        const shuffled = [...source].sort(() => 0.5 - Math.random());
         filtered = shuffled.slice(0, 6);
 
     } else {
@@ -262,7 +267,7 @@ function updateStatsPanel(conns) {
     const nameEl = document.getElementById('stat-process-name');
     const countEl = document.getElementById('stat-process-count');
     if (nameEl && countEl) {
-        nameEl.innerText = topName.length > 12 ? topName.substring(0, 12) + '...' : topName;
+        nameEl.innerText = topName.length > 24 ? topName.substring(0, 24) + '...' : topName;
         nameEl.title = topName; // Tooltip for full name
         const suffix = currentLang === 'zh' ? ' 个连接' : ' conns';
         countEl.innerText = topCount + suffix;

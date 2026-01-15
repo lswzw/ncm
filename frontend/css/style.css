@@ -321,6 +321,28 @@ tr:hover td {
     box-shadow: 0 0 8px #fb923c;
 }
 
+.status-timewait {
+    background: rgba(234, 179, 8, 0.1);
+    color: #facc15;
+    border-color: rgba(234, 179, 8, 0.2);
+}
+
+.status-timewait .status-dot {
+    background: #facc15;
+    box-shadow: 0 0 8px #facc15;
+}
+
+.status-closewait {
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.status-closewait .status-dot {
+    background: #f87171;
+    box-shadow: 0 0 8px #f87171;
+}
+
 .status-other {
     background: rgba(148, 163, 184, 0.1);
     color: #cbd5e1;
@@ -369,23 +391,20 @@ tr:hover td {
 .stats-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    padding: 20px 30px;
-    /* 增加左右 padding 与表格一致 */
+    gap: 8px;
+    padding: 8px 20px;
     margin-top: 0;
     border-top: 1px solid var(--glass-border);
     background: rgba(0, 0, 0, 0.2);
-    /* 加深背景 */
     width: 100%;
     box-sizing: border-box;
-    /* 放在 glass-panel 内部底部 */
 }
 
 .stat-card {
     background: linear-gradient(145deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
     border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    padding: 20px;
+    border-radius: 8px;
+    padding: 8px 14px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -395,7 +414,7 @@ tr:hover td {
 }
 
 .stat-card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     background: rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 255, 255, 0.1);
 }
@@ -407,7 +426,7 @@ tr:hover td {
     left: 0;
     top: 0;
     bottom: 0;
-    width: 4px;
+    width: 3px;
 }
 
 .card-blue::before {
@@ -430,32 +449,32 @@ tr:hover td {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 8px;
+    margin-bottom: 0px;
 }
 
 .stat-label {
-    font-size: 13px;
+    font-size: 11px;
     color: var(--text-muted);
     font-weight: 500;
 }
 
 .stat-icon-small {
-    font-size: 16px;
+    font-size: 14px;
     opacity: 0.7;
 }
 
 .stat-value {
-    font-size: 28px;
+    font-size: 18px;
     font-weight: 700;
     color: var(--text-main);
     font-family: 'Outfit', sans-serif;
-    line-height: 1.2;
+    line-height: 1.1;
 }
 
 .stat-subtext {
-    font-size: 12px;
+    font-size: 10px;
     color: var(--text-muted);
-    margin-top: 4px;
+    margin-top: 2px;
     opacity: 0.6;
 }
 
@@ -465,29 +484,33 @@ tr:hover td {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 24px;
-    padding: 16px 24px;
+    gap: 12px;
+    padding: 6px 14px;
 }
 
 .stat-card.span-full .stat-header {
     margin-bottom: 0;
-    min-width: 140px;
+    min-width: 90px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 6px;
 }
 
 .stat-card.span-full .stat-value {
     flex: 1;
     text-align: left;
-    font-size: 22px;
+    font-size: 16px;
     margin: 0;
+    /* 允许进程名长文本显示 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .stat-card.span-full .stat-subtext {
     margin-top: 0;
-    min-width: 100px;
+    min-width: 60px;
     text-align: right;
-    font-size: 14px;
+    font-size: 12px;
     opacity: 0.8;
 }
