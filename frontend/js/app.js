@@ -58,6 +58,36 @@ let currentLang = 'zh';
 let currentFilter = 'ALL';
 let allConnections = []; // Store data for local filtering
 let refreshIntervalId = null;
+let sortColumn = null; // 'local' | 'remote' | null
+let sortDirection = 'asc'; // 'asc' | 'desc'
+
+// Helper: 比较 IP 地址（数字排序）
+function compareIP(a, b) {
+    const parseIP = (addr) => {
+        const match = addr.match(/^([^:]+)/);
+        if (!match) return [0, 0, 0, 0];
+        const ip = match[1];
+        if (ip.includes('.')) {
+            // IPv4
+            return ip.split('.').map(n => parseInt(n) || 0);
+        } else {
+            // IPv6 或其他，简单字符串比较
+            return [ip];
+        }
+    };
+
+    const aParts = parseIP(a);
+    const bParts = parseIP(b);
+
+    for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+        const aVal = aParts[i] || 0;
+        const bVal = bParts[i] || 0;
+        if (aVal !== bVal) {
+            return aVal - bVal;
+        }
+    }
+    return 0;
+}
 
 function toggleLang() {
     currentLang = currentLang === 'zh' ? 'en' : 'zh';
@@ -260,6 +290,19 @@ function applyFilterAndRender() {
     renderTable(filtered);
 }
 
+// 排序功能
+function sortBy(column) {
+    if (sortColumn === column) {
+        // Toggle direction
+        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        sortColumn = column;
+        sortDirection = 'asc';
+    }
+    // Re-render with current filter
+    applyFilterAndRender();
+}
+
 function updateStatsPanel(conns) {
     // 统计面板：显示所有连接的真实数据（不过滤本地连接）
     const total = conns.length;
@@ -311,7 +354,21 @@ function renderTable(conns) {
         return;
     }
 
-    conns.forEach(c => {
+    // Apply sorting if active
+    let sortedConns = [...conns];
+    if (sortColumn) {
+        sortedConns.sort((a, b) => {
+            let result = 0;
+            if (sortColumn === 'local') {
+                result = compareIP(a.local_addr, b.local_addr);
+            } else if (sortColumn === 'remote') {
+                result = compareIP(a.remote_addr, b.remote_addr);
+            }
+            return sortDirection === 'asc' ? result : -result;
+        });
+    }
+
+    sortedConns.forEach(c => {
         const tr = document.createElement('tr');
 
         // 样式计算
