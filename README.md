@@ -13,7 +13,7 @@ Ncm 是一个轻量级、跨平台的电脑网络连接监控软件。它能够�
 
 ## 📸 界面预览
 
-![UI Mockup](docs/ncm_ui_mockup.png)
+![UI Mockup](docs/ncm_ui_mockup.jpg)
 
 ## 🛠️ 技术栈
 
