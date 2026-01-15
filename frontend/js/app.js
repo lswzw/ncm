@@ -7,6 +7,10 @@ const i18n = {
         nav_listen: "正在监听",
         nav_other: "其他状态",
         nav_about: "关于软件",
+        stat_total: "全部连接",
+        stat_est: "正在通信",
+        stat_listen: "正在监听",
+        stat_process: "最活跃进程",
         local_addr: "本地地址",
         remote_addr: "远程地址",
         status: "状态",
@@ -28,6 +32,10 @@ const i18n = {
         nav_listen: "Listening",
         nav_other: "Others",
         nav_about: "About App",
+        stat_total: "Total",
+        stat_est: "Established",
+        stat_listen: "Listening",
+        stat_process: "Top Process",
         local_addr: "Local Address",
         remote_addr: "Remote Address",
         status: "Status",
@@ -78,7 +86,7 @@ function setFilter(filter) {
 
     let activeId = 'nav-overview'; // Default
     if (filter === 'ALL_LIST') {
-        currentFilter = 'ALL'; // Logic uses 'ALL'
+        // currentFilter = 'ALL_LIST'; // Keep as is
         activeId = 'nav-all';
     }
     else if (filter === 'ALL') activeId = 'nav-overview';
@@ -185,16 +193,80 @@ function renderMockData() {
     applyFilterAndRender();
 }
 
+
 function applyFilterAndRender() {
-    let filtered = allConnections;
-    if (currentFilter !== 'ALL') {
-        if (currentFilter === 'OTHER') {
+    const statsPanel = document.getElementById('overview-stats');
+    let filtered = [];
+
+    if (currentFilter === 'ALL') {
+        // --- 概览模式 (Overview) ---
+
+        // 1. 显示统计面板
+        if (statsPanel) {
+            statsPanel.style.display = 'grid';
+            updateStatsPanel(allConnections);
+        }
+
+        // 2. 随机取 6 条展示
+        // 克隆数组以免影响原数据，然后打乱
+        const shuffled = [...allConnections].sort(() => 0.5 - Math.random());
+        filtered = shuffled.slice(0, 6);
+
+    } else {
+        // --- 其他列表模式 ---
+
+        // 1. 隐藏统计面板
+        if (statsPanel) {
+            statsPanel.style.display = 'none';
+        }
+
+        // 2. 正常筛选
+        if (currentFilter === 'ALL_LIST') {
+            filtered = allConnections;
+        } else if (currentFilter === 'OTHER') {
             filtered = allConnections.filter(c => c.status !== 'ESTABLISHED' && c.status !== 'LISTEN');
         } else {
             filtered = allConnections.filter(c => c.status === currentFilter);
         }
     }
+
     renderTable(filtered);
+}
+
+function updateStatsPanel(conns) {
+    const total = conns.length;
+    const est = conns.filter(c => c.status === 'ESTABLISHED').length;
+    const listen = conns.filter(c => c.status === 'LISTEN').length;
+
+    // Calculate Top Process
+    const processCounts = {};
+    conns.forEach(c => {
+        const name = c.process || 'Unknown';
+        processCounts[name] = (processCounts[name] || 0) + 1;
+    });
+
+    let topName = '-';
+    let topCount = 0;
+    for (const [name, count] of Object.entries(processCounts)) {
+        if (count > topCount) {
+            topName = name;
+            topCount = count;
+        }
+    }
+
+    document.getElementById('stat-total').innerText = total;
+    document.getElementById('stat-est').innerText = est;
+    document.getElementById('stat-listen').innerText = listen;
+
+    // Update Top Process Card
+    const nameEl = document.getElementById('stat-process-name');
+    const countEl = document.getElementById('stat-process-count');
+    if (nameEl && countEl) {
+        nameEl.innerText = topName.length > 12 ? topName.substring(0, 12) + '...' : topName;
+        nameEl.title = topName; // Tooltip for full name
+        const suffix = currentLang === 'zh' ? ' 个连接' : ' conns';
+        countEl.innerText = topCount + suffix;
+    }
 }
 
 function renderTable(conns) {
@@ -215,8 +287,8 @@ function renderTable(conns) {
         else if (c.status === 'LISTEN') statusClass = 'status-listen';
 
         tr.innerHTML = `
-            <td style="font-family:monospace; color:#e2e8f0; font-size:13px;">${c.local_addr}</td>
-            <td style="font-family:monospace; color:#94a3b8; font-size:13px;">${c.remote_addr}</td>
+            <td style="font-family:monospace; color:#e2e8f0; font-size:12px;">${c.local_addr}</td>
+            <td style="font-family:monospace; color:#94a3b8; font-size:12px;">${c.remote_addr}</td>
             <td>
                 <span class="status-tag ${statusClass}">
                     <span class="status-dot"></span>
@@ -225,8 +297,8 @@ function renderTable(conns) {
             </td>
             <td>
                 <div style="display:flex; flex-direction:column;">
-                    <span style="font-weight:500; color:#f8fafc;">${c.process}</span>
-                    <span style="font-size:11px; color:#64748b;">PID: ${c.pid}</span>
+                    <span style="font-weight:500; color:#f8fafc; font-size:12px;">${c.process}</span>
+                    <span style="font-size:10px; color:#64748b;">PID: ${c.pid}</span>
                 </div>
             </td>
         `;
