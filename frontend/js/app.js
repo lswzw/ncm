@@ -287,7 +287,28 @@ function applyFilterAndRender() {
         }
     }
 
+    updateNavCounts(allConnections);
     renderTable(filtered);
+}
+
+// 更新导航栏数字
+function updateNavCounts(conns) {
+    const total = conns.length;
+    const est = conns.filter(c => c.status === 'ESTABLISHED').length;
+    const listen = conns.filter(c => c.status === 'LISTEN').length;
+    const wait = conns.filter(c => c.status === 'TIME_WAIT' || c.status === 'CLOSE_WAIT').length;
+    const other = conns.filter(c =>
+        c.status !== 'ESTABLISHED' &&
+        c.status !== 'LISTEN' &&
+        c.status !== 'TIME_WAIT' &&
+        c.status !== 'CLOSE_WAIT'
+    ).length;
+
+    document.getElementById('nav-count-all').innerText = total;
+    document.getElementById('nav-count-est').innerText = est;
+    document.getElementById('nav-count-listen').innerText = listen;
+    document.getElementById('nav-count-wait').innerText = wait;
+    document.getElementById('nav-count-other').innerText = other;
 }
 
 // 排序功能
