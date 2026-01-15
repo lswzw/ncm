@@ -196,6 +196,16 @@ function renderMockData() {
 }
 
 
+// Helper to check if connection is external (excludes 127.0.0.1, localhost, ::1, [::1])
+function isExternal(conn) {
+    if (!conn || !conn.remote_addr) return false;
+    const r = conn.remote_addr;
+    return !r.startsWith('127.0.0.1') &&
+        !r.startsWith('localhost') &&
+        !r.startsWith('::1') &&
+        !r.startsWith('[::1]');
+}
+
 function applyFilterAndRender() {
     const statsPanel = document.getElementById('overview-stats');
     let filtered = [];
@@ -209,10 +219,10 @@ function applyFilterAndRender() {
             updateStatsPanel(allConnections);
         }
 
-        // 2. 概览模式只展示"正在通信"的连接 (随机取6条)
-        // 如果没有通信连接，则显示空或随机其他
-        const established = allConnections.filter(c => c.status === 'ESTABLISHED');
-        const source = established.length > 0 ? established : allConnections;
+        // 2. 概览模式只展示"正在通信"且"非本地"的连接
+        // 过滤掉 127.0.0.1 等本地回环
+        const meaningful = allConnections.filter(c => c.status === 'ESTABLISHED' && isExternal(c));
+        const source = meaningful.length > 0 ? meaningful : allConnections.filter(c => c.status === 'ESTABLISHED');
 
         const shuffled = [...source].sort(() => 0.5 - Math.random());
         filtered = shuffled.slice(0, 6);
@@ -228,8 +238,15 @@ function applyFilterAndRender() {
         // 2. 正常筛选
         if (currentFilter === 'ALL_LIST') {
             filtered = allConnections;
+        } else if (currentFilter === 'WAIT') {
+            filtered = allConnections.filter(c => c.status === 'TIME_WAIT' || c.status === 'CLOSE_WAIT');
         } else if (currentFilter === 'OTHER') {
-            filtered = allConnections.filter(c => c.status !== 'ESTABLISHED' && c.status !== 'LISTEN');
+            filtered = allConnections.filter(c =>
+                c.status !== 'ESTABLISHED' &&
+                c.status !== 'LISTEN' &&
+                c.status !== 'TIME_WAIT' &&
+                c.status !== 'CLOSE_WAIT'
+            );
         } else {
             filtered = allConnections.filter(c => c.status === currentFilter);
         }
@@ -239,13 +256,18 @@ function applyFilterAndRender() {
 }
 
 function updateStatsPanel(conns) {
+    // 统计面板：
+    // Total & Listen: 保持真实总数
+    // Established & Top Process: 仅统计外部连接 (排除本地回环)
     const total = conns.length;
-    const est = conns.filter(c => c.status === 'ESTABLISHED').length;
+    const est = conns.filter(c => c.status === 'ESTABLISHED' && isExternal(c)).length;
     const listen = conns.filter(c => c.status === 'LISTEN').length;
+
+    const activeConns = conns.filter(c => c.status === 'ESTABLISHED' && isExternal(c));
 
     // Calculate Top Process
     const processCounts = {};
-    conns.forEach(c => {
+    activeConns.forEach(c => {
         const name = c.process || 'Unknown';
         processCounts[name] = (processCounts[name] || 0) + 1;
     });
