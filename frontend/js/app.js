@@ -137,6 +137,10 @@ function showAbout() {
     const connView = document.getElementById('connections-view');
     if (connView) connView.style.display = 'none';
 
+    // Explicitly hide stats panel
+    const statsPanel = document.getElementById('overview-stats');
+    if (statsPanel) statsPanel.style.display = 'none';
+
     const aboutView = document.getElementById('about-view');
     if (aboutView) aboutView.style.display = 'block';
 
