@@ -261,15 +261,13 @@ function applyFilterAndRender() {
 }
 
 function updateStatsPanel(conns) {
-    // 统计面板：
-    // Total & Listen: 保持真实总数
-    // Established & Top Process: 仅统计外部连接 (排除本地回环)
+    // 统计面板：显示所有连接的真实数据（不过滤本地连接）
     const total = conns.length;
-    const est = conns.filter(c => c.status === 'ESTABLISHED' && isExternal(c)).length;
+    const est = conns.filter(c => c.status === 'ESTABLISHED').length;
     const listen = conns.filter(c => c.status === 'LISTEN').length;
     const wait = conns.filter(c => c.status === 'TIME_WAIT' || c.status === 'CLOSE_WAIT').length;
 
-    const activeConns = conns.filter(c => c.status === 'ESTABLISHED' && isExternal(c));
+    const activeConns = conns.filter(c => c.status === 'ESTABLISHED');
 
     // Calculate Top Process
     const processCounts = {};
