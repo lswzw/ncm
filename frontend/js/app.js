@@ -40,9 +40,44 @@ function updateTexts() {
 
 // 模拟从 Wails 后端获取数据
 async function refreshConnections() {
-    // 实际项目中这里通过 window.go.network.Scanner.GetConnections() 调用
-    console.log("Refreshing connections...");
-    // 动态更新表格内容的逻辑...
+    try {
+        if (!window['go'] || !window['go']['main'] || !window['go']['main']['App']) {
+            console.warn("Wails runtime not ready, skipping update.");
+            return;
+        }
+
+        document.getElementById('conn-body').innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--text-secondary);">${i18n[currentLang].refreshing}</td></tr>`;
+
+        const conns = await window.go.main.App.GetConnections();
+
+        const tbody = document.getElementById('conn-body');
+        tbody.innerHTML = '';
+
+        if (!conns || conns.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No connections found</td></tr>`;
+            return;
+        }
+
+        conns.forEach(c => {
+            const tr = document.createElement('tr');
+
+            // 状态样式
+            let statusClass = 'status-other';
+            if (c.status === 'ESTABLISHED') statusClass = 'status-established';
+            else if (c.status === 'LISTEN') statusClass = 'status-listen';
+
+            tr.innerHTML = `
+                <td>${c.local_addr}</td>
+                <td>${c.remote_addr}</td>
+                <td><span class="status-tag ${statusClass}">${c.status}</span></td>
+                <td>${c.process} <span style="font-size:10px;color:#666">(${c.pid})</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+    } catch (err) {
+        console.error("Failed to get connections:", err);
+    }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
