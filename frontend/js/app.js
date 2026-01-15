@@ -6,6 +6,7 @@ const i18n = {
         nav_est: "正在通信",
         nav_listen: "正在监听",
         nav_wait: "等待关闭",
+        nav_suspicious: "可疑连接",
         nav_other: "其他状态",
         nav_about: "关于软件",
         stat_total: "全部连接",
@@ -23,7 +24,7 @@ const i18n = {
         btn_lang: "EN",
         empty: "暂无相关连接",
         about_title: "关于 Ncm",
-        about_content: "Ncm (Network Connection Monitor)\n一个基于 Wails 开发的跨平台网络连接监控工具。\n\n版本: v1.0.0"
+        about_content: "Ncm (Network Connection Monitor)\n一个基于 Wails 开发的跨平台网络连接监控工具。\n\n版本: v1.1.0"
     },
     en: {
         title: "Network Connections",
@@ -32,6 +33,7 @@ const i18n = {
         nav_est: "Established",
         nav_listen: "Listening",
         nav_wait: "Waiting Close",
+        nav_suspicious: "Suspicious",
         nav_other: "Others",
         nav_about: "About App",
         stat_total: "Total",
@@ -50,7 +52,7 @@ const i18n = {
         btn_lang: "中",
         empty: "No connections found",
         about_title: "About Ncm",
-        about_content: "Ncm (Network Connection Monitor)\nA cross-platform network monitor tool built with Wails.\n\nVersion: v1.0.0"
+        about_content: "Ncm (Network Connection Monitor)\nA cross-platform network monitor tool built with Wails.\n\nVersion: v1.1.0"
     }
 };
 
@@ -87,6 +89,26 @@ function compareIP(a, b) {
         }
     }
     return 0;
+}
+
+// 常用端口白名单
+const COMMON_PORTS = [80, 443, 22, 21, 25, 53, 3306, 5432, 6379, 8080, 8443, 9000, 27017, 5000];
+
+// 判断是否为可疑连接
+function isSuspicious(conn) {
+    // 只检查 ESTABLISHED 状态
+    if (conn.status !== 'ESTABLISHED') return false;
+
+    // 必须是外部连接
+    if (!isExternal(conn)) return false;
+
+    // 提取远程端口
+    const portMatch = conn.remote_addr.match(/:(\d+)$/);
+    if (!portMatch) return false;
+    const remotePort = parseInt(portMatch[1]);
+
+    // 非常用端口则标记为可疑
+    return !COMMON_PORTS.includes(remotePort);
 }
 
 function toggleLang() {
@@ -126,6 +148,7 @@ function setFilter(filter) {
     else if (filter === 'ESTABLISHED') activeId = 'nav-est';
     else if (filter === 'LISTEN') activeId = 'nav-listen';
     else if (filter === 'WAIT') activeId = 'nav-wait';
+    else if (filter === 'SUSPICIOUS') activeId = 'nav-suspicious';
     else if (filter === 'OTHER') activeId = 'nav-other';
 
     const activeEl = document.getElementById(activeId);
@@ -144,6 +167,7 @@ function setFilter(filter) {
     else if (filter === 'ESTABLISHED') titleKey = 'nav_est';
     else if (filter === 'LISTEN') titleKey = 'nav_listen';
     else if (filter === 'WAIT') titleKey = 'nav_wait';
+    else if (filter === 'SUSPICIOUS') titleKey = 'nav_suspicious';
     else if (filter === 'OTHER') titleKey = 'nav_other';
 
     const titleEl = document.querySelector('.page-title');
@@ -277,6 +301,8 @@ function applyFilterAndRender() {
             filtered = allConnections;
         } else if (currentFilter === 'WAIT') {
             filtered = allConnections.filter(c => c.status === 'TIME_WAIT' || c.status === 'CLOSE_WAIT');
+        } else if (currentFilter === 'SUSPICIOUS') {
+            filtered = allConnections.filter(isSuspicious);
         } else if (currentFilter === 'OTHER') {
             filtered = allConnections.filter(c =>
                 c.status !== 'ESTABLISHED' &&
@@ -299,6 +325,7 @@ function updateNavCounts(conns) {
     const est = conns.filter(c => c.status === 'ESTABLISHED').length;
     const listen = conns.filter(c => c.status === 'LISTEN').length;
     const wait = conns.filter(c => c.status === 'TIME_WAIT' || c.status === 'CLOSE_WAIT').length;
+    const suspicious = conns.filter(isSuspicious).length;
     const other = conns.filter(c =>
         c.status !== 'ESTABLISHED' &&
         c.status !== 'LISTEN' &&
@@ -310,6 +337,7 @@ function updateNavCounts(conns) {
     document.getElementById('nav-count-est').innerText = est;
     document.getElementById('nav-count-listen').innerText = listen;
     document.getElementById('nav-count-wait').innerText = wait;
+    document.getElementById('nav-count-suspicious').innerText = suspicious;
     document.getElementById('nav-count-other').innerText = other;
 }
 
@@ -393,6 +421,11 @@ function renderTable(conns) {
 
     sortedConns.forEach(c => {
         const tr = document.createElement('tr');
+
+        // 可疑连接标记
+        if (isSuspicious(c)) {
+            tr.classList.add('suspicious');
+        }
 
         // 样式计算
         let statusClass = 'status-other';

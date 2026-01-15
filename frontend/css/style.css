@@ -352,6 +352,16 @@ tr:hover td {
     background: #94a3b8;
 }
 
+/* 可疑连接行高亮 */
+tr.suspicious {
+    background: rgba(239, 68, 68, 0.08) !important;
+    border-left: 3px solid #ef4444;
+}
+
+tr.suspicious:hover {
+    background: rgba(239, 68, 68, 0.15) !important;
+}
+
 /* 装饰波纹 */
 .wave-decoration {
     position: absolute;
