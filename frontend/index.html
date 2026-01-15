@@ -109,7 +109,7 @@
                 <!-- 概览页统计面板 (独立于表格容器) -->
                 <div id="overview-stats" class="stats-container" style="display: none;">
                     <!-- 卡片 1: 全部连接 -->
-                    <div class="stat-card card-blue">
+                    <div class="stat-card card-blue" onclick="setFilter('ALL_LIST')">
                         <div class="stat-header">
                             <div class="stat-label" data-i18n="stat_total">全部连接</div>
                         </div>
@@ -117,7 +117,7 @@
                     </div>
 
                     <!-- 卡片 2: 正在通信 -->
-                    <div class="stat-card card-green">
+                    <div class="stat-card card-green" onclick="setFilter('ESTABLISHED')">
                         <div class="stat-header">
                             <div class="stat-label" data-i18n="stat_est">正在通信</div>
                         </div>
@@ -125,7 +125,7 @@
                     </div>
 
                     <!-- 卡片 3: 正在监听 -->
-                    <div class="stat-card card-orange">
+                    <div class="stat-card card-orange" onclick="setFilter('LISTEN')">
                         <div class="stat-header">
                             <div class="stat-label" data-i18n="stat_listen">正在监听</div>
                         </div>

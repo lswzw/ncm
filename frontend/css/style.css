@@ -411,6 +411,7 @@ tr:hover td {
     transition: all 0.2s;
     position: relative;
     overflow: hidden;
+    cursor: pointer;
 }
 
 .stat-card:hover {
