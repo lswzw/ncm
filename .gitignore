@@ -1,11 +1,6 @@
 # Wails build output
 build/bin/
 
-# Frontend dependencies and builds
-frontend/node_modules/
-frontend/dist/
-frontend/.vite/
-
 # System files
 .DS_Store
 Thumbs.db

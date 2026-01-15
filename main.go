@@ -18,8 +18,8 @@ func main() {
 	// Create application with options
 	err := wails.Run(&options.App{
 		Title:  "Ncm - 电脑连接监控",
-		Width:  1024,
-		Height: 768,
+		Width:  1111,
+		Height: 666,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},

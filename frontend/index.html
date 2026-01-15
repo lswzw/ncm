@@ -1,36 +1,142 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ncm - Network Monitor</title>
     <link rel="stylesheet" href="css/style.css">
+    <!-- 引入 Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="title" data-i18n="title">电脑连接监控</div>
-            <div class="controls">
-                <button class="btn" onclick="toggleLang()" data-i18n="lang">English</button>
-                <button class="btn" onclick="refreshConnections()" data-i18n="refresh">刷新</button>
+    <!-- 静态背景在 CSS 中定义 -->
+
+    <div class="app-layout">
+        <!-- 侧边栏 -->
+        <nav class="sidebar">
+            <div class="brand">
+                <span class="logo-text">Ncm</span>
             </div>
-        </div>
-        <div class="connection-list">
-            <table>
-                <thead>
-                    <tr>
-                        <th data-i18n="local_addr">本地地址</th>
-                        <th data-i18n="remote_addr">远程地址</th>
-                        <th data-i18n="status">状态</th>
-                        <th data-i18n="process">进程</th>
-                    </tr>
-                </thead>
-                <tbody id="conn-body">
-                    <!-- 动态内容 -->
-                </tbody>
-            </table>
-        </div>
+
+            <ul class="nav-links">
+                <li class="nav-item active" onclick="setFilter('ALL')" id="nav-overview">
+                    <span class="icon">≡</span>
+                    <span data-i18n="nav_overview">连接概览</span>
+                </li>
+                <li class="nav-item" onclick="setFilter('ALL_LIST')" id="nav-all">
+                    <span class="icon">list</span>
+                    <span data-i18n="nav_all_conns">全部连接</span>
+                </li>
+                <li class="nav-item" onclick="setFilter('ESTABLISHED')" id="nav-est">
+                    <span class="icon">⇋</span>
+                    <span data-i18n="nav_est">正在通信</span>
+                </li>
+                <li class="nav-item" onclick="setFilter('LISTEN')" id="nav-listen">
+                    <span class="icon">◉</span>
+                    <span data-i18n="nav_listen">正在监听</span>
+                </li>
+                <li class="nav-item" onclick="setFilter('OTHER')" id="nav-other">
+                    <span class="icon">○</span>
+                    <span data-i18n="nav_other">其他状态</span>
+                </li>
+            </ul>
+
+            <div style="margin-top: auto;">
+                <ul class="nav-links">
+                    <li class="nav-item" onclick="showAbout('ABOUT')" id="nav-about">
+                        <span class="icon">ⓘ</span>
+                        <span data-i18n="nav_about">关于软件</span>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h1 class="page-title" data-i18n="title">网络连接</h1>
+
+                <div class="controls">
+                    <div class="control-group">
+                        <label data-i18n="refresh_rate">频率:</label>
+                        <select id="refresh-rate" onchange="changeRefreshRate()">
+                            <option value="1000">1s</option>
+                            <option value="3000">3s</option>
+                            <option value="5000" selected>5s</option>
+                            <option value="10000">10s</option>
+                            <option value="30000">30s</option>
+                            <option value="0" data-i18n="rate_manual">手动</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-icon" onclick="toggleLang()" title="Switch Language">
+                        <span class="icon">🌐</span>
+                    </button>
+
+                    <button class="btn btn-primary" onclick="refreshConnections()">
+                        <span class="icon">↻</span>
+                        <span data-i18n="refresh">刷新</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="glass-panel">
+                <div class="table-container" id="connections-view">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-i18n="local_addr">本地地址</th>
+                                <th data-i18n="remote_addr">远程地址</th>
+                                <th data-i18n="status">状态</th>
+                                <th data-i18n="process">进程</th>
+                            </tr>
+                        </thead>
+                        <tbody id="conn-body">
+                            <!-- 动态内容 -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="about-view" style="display: none; padding: 40px; text-align: center; color: var(--text-main);">
+                    <div style="font-size: 64px; margin-bottom: 20px;">⚡️</div>
+                    <h2
+                        style="font-size: 32px; margin-bottom: 10px; background: linear-gradient(135deg, #38bdf8, #a855f7); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                        Ncm</h2>
+                    <p style="font-size: 18px; color: var(--text-muted); margin-bottom: 30px;">Network Connection
+                        Monitor</p>
+
+                    <div
+                        style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; display: inline-block; text-align: left;">
+                        <p style="margin: 5px 0;"><span style="color: var(--text-muted);">Version:</span> v1.0.0</p>
+                        <p style="margin: 5px 0;"><span style="color: var(--text-muted);">Author:</span> Lswzw</p>
+                        <p style="margin: 5px 0;"><span style="color: var(--text-muted);">GitHub:</span> <a
+                                href="https://github.com/Lswzw">https://github.com/Lswzw</a></p>
+                        <p style="margin: 5px 0;"><span style="color: var(--text-muted);">Tech Stack:</span> Go + Wails
+                            + Vanilla JS</p>
+                    </div>
+
+                    <p style="margin-top: 40px; font-size: 14px; opacity: 0.5;">© 2026 Ncm Project. All rights reserved.
+                    </p>
+                </div>
+
+                <!-- 底部模拟波形图装饰 -->
+                <div class="wave-decoration">
+                    <svg viewBox="0 0 1000 100" preserveAspectRatio="none">
+                        <path d="M0,50 C200,80 400,20 600,50 C800,80 1000,20 1000,50 L1000,100 L0,100 Z"
+                            fill="rgba(56, 189, 248, 0.1)"></path>
+                        <path d="M0,60 C200,90 400,30 600,60 C800,90 1000,30 1000,60 L1000,100 L0,100 Z"
+                            fill="rgba(129, 140, 248, 0.1)"></path>
+                    </svg>
+                </div>
+            </div>
+        </main>
     </div>
+
     <script src="js/app.js"></script>
 </body>
+
 </html>
