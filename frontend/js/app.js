@@ -37,6 +37,7 @@ const i18n = {
         stat_total: "Total",
         stat_est: "Established",
         stat_listen: "Listening",
+        stat_wait: "Waiting Close",
         stat_process: "Top Process",
         local_addr: "Local Address",
         remote_addr: "Remote Address",
@@ -266,6 +267,7 @@ function updateStatsPanel(conns) {
     const total = conns.length;
     const est = conns.filter(c => c.status === 'ESTABLISHED' && isExternal(c)).length;
     const listen = conns.filter(c => c.status === 'LISTEN').length;
+    const wait = conns.filter(c => c.status === 'TIME_WAIT' || c.status === 'CLOSE_WAIT').length;
 
     const activeConns = conns.filter(c => c.status === 'ESTABLISHED' && isExternal(c));
 
@@ -288,6 +290,8 @@ function updateStatsPanel(conns) {
     document.getElementById('stat-total').innerText = total;
     document.getElementById('stat-est').innerText = est;
     document.getElementById('stat-listen').innerText = listen;
+    const waitEl = document.getElementById('stat-wait');
+    if (waitEl) waitEl.innerText = wait;
 
     // Update Top Process Card
     const nameEl = document.getElementById('stat-process-name');

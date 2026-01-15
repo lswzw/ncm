@@ -388,9 +388,10 @@ tr:hover td {
 }
 
 /* 统计卡片面板 */
+/* 统计卡片面板 */
 .stats-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 8px;
     padding: 8px 20px;
     margin-top: 0;
@@ -440,6 +441,10 @@ tr:hover td {
 
 .card-orange::before {
     background: #fb923c;
+}
+
+.card-yellow::before {
+    background: #facc15;
 }
 
 .card-purple::before {
