@@ -125,6 +125,7 @@ function setFilter(filter) {
     else if (filter === 'ALL') activeId = 'nav-overview';
     else if (filter === 'ESTABLISHED') activeId = 'nav-est';
     else if (filter === 'LISTEN') activeId = 'nav-listen';
+    else if (filter === 'WAIT') activeId = 'nav-wait';
     else if (filter === 'OTHER') activeId = 'nav-other';
 
     const activeEl = document.getElementById(activeId);
@@ -142,6 +143,7 @@ function setFilter(filter) {
     else if (filter === 'ALL') titleKey = 'nav_overview';
     else if (filter === 'ESTABLISHED') titleKey = 'nav_est';
     else if (filter === 'LISTEN') titleKey = 'nav_listen';
+    else if (filter === 'WAIT') titleKey = 'nav_wait';
     else if (filter === 'OTHER') titleKey = 'nav_other';
 
     const titleEl = document.querySelector('.page-title');
