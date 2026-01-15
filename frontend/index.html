@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ncm - Network Monitor</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title" data-i18n="title">电脑连接监控</div>
+            <div class="controls">
+                <button class="btn" onclick="toggleLang()" data-i18n="lang">English</button>
+                <button class="btn" onclick="refreshConnections()" data-i18n="refresh">刷新</button>
+            </div>
+        </div>
+        <div class="connection-list">
+            <table>
+                <thead>
+                    <tr>
+                        <th data-i18n="local_addr">本地地址</th>
+                        <th data-i18n="remote_addr">远程地址</th>
+                        <th data-i18n="status">状态</th>
+                        <th data-i18n="process">进程</th>
+                    </tr>
+                </thead>
+                <tbody id="conn-body">
+                    <!-- 动态内容 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="js/app.js"></script>
+</body>
+</html>
