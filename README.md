@@ -1,5 +1,9 @@
 # Ncm (Network Connection Monitor)
 
+> [!CAUTION]
+> **该项目已停止维护。**
+> 请移步访问更新版本：[ncm-c](https://github.com/lswzw/ncm-c)
+
 Ncm 是一个轻量级、跨平台的电脑网络连接监控软件。它能够实时显示当前系统的活动网络连接、监听端口及其对应的进程信息，帮助用户及时发现异常的网络请求。
 
 ## ✨ 功能特性
